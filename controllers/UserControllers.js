@@ -23,7 +23,7 @@ const generateJwt = (id, email, username, first_name, last_name, referral) => {
 };
 
 const podpiskaCheck = async(user, level, userId)=>{
-  if (user.balance < 1000 || user.locale < 1000){
+  if ((user.balance < 1000) && (user.locale < 1000)){
     return next(ApiError.badRequest("Для создания Лицензии недостаточно средств на балансе"));
   } else if (user.balance >= 1000){
     let updatePodpiska = {balance: user.balance - 1000, podpiska: user.podpiska + 1000}
@@ -33,7 +33,7 @@ const podpiskaCheck = async(user, level, userId)=>{
     await User.update(updatePodpiska, {where:{id:user.id}})
   }
   const updatedUser = await User.findOne({where:{id:userId}})
-  if ((updatedUser.balance < 5000) || (updatedUser.locale < 5000)){
+  if ((updatedUser.balance < 5000) && (updatedUser.locale < 5000)){
     return next(ApiError.badRequest("Для создания Лицензии недостаточно средств на балансе"));
   } else if (updatedUser.balance >= 5000) {
     let updateKurs
@@ -378,40 +378,64 @@ class UserController {
     let updatePlus
     switch (level) {
       case 1:
-        if(userToken.balance < 5000){
+        if((userToken.balance < 5000) && (userToken.locale < 5000)){
           return next(ApiError.badRequest("Для активации Лицензии пополните баланс"));
+        } else if (userToken.balance >= 5000){
+          updateMinus = { balance: userToken.balance - 5000 };
+          await User.update(updateMinus, {where:{id:userToken.id}})
+          updatePlus = { balance: user.balance + 5000 };
+          await User.update(updatePlus, {where:{id:user.id}})
+        } else if (userToken.locale >= 5000){
+          updateMinus = { locale: userToken.locale - 5000 };
+          await User.update(updateMinus, {where:{id:userToken.id}})
+          updatePlus = { balance: user.balance + 5000 };
+          await User.update(updatePlus, {where:{id:user.id}})
         }
-        updateMinus = { balance: userToken.balance - 5000 };
-        await User.update(updateMinus, {where:{id:userToken.id}})
-        updatePlus = { balance: user.balance + 5000 };
-        await User.update(updatePlus, {where:{id:user.id}})
         break;
       case 2:
-        if(userToken.balance < 10000){
+        if((userToken.balance < 10000) && (userToken.locale < 10000)){
           return next(ApiError.badRequest("Для активации Лицензии пополните баланс"));
+        }else if (userToken.balance >= 10000){
+          updateMinus = { balance: userToken.balance - 10000 };
+          await User.update(updateMinus, {where:{id:userToken.id}})
+          updatePlus = { balance: user.balance + 10000 };
+          await User.update(updatePlus, {where:{id:user.id}})
+        } else if (userToken.locale >= 10000){
+          updateMinus = { locale: userToken.locale - 10000 };
+          await User.update(updateMinus, {where:{id:userToken.id}})
+          updatePlus = { balance: user.balance + 10000 };
+          await User.update(updatePlus, {where:{id:user.id}})
         }
-        updateMinus = { balance: userToken.balance - 10000 };
-        await User.update(updateMinus, {where:{id:userToken.id}})
-        updatePlus = { balance: user.balance + 10000 };
-        await User.update(updatePlus, {where:{id:user.id}})
         break;
       case 3:
-        if(userToken.balance < 40000){
+        if((userToken.balance < 40000) && (userToken.locale < 40000)){
           return next(ApiError.badRequest("Для активации Лицензии пополните баланс"));
+        }else if (userToken.balance >= 40000){
+          updateMinus = { balance: userToken.balance - 40000 };
+          await User.update(updateMinus, {where:{id:userToken.id}})
+          updatePlus = { balance: user.balance + 40000 };
+          await User.update(updatePlus, {where:{id:user.id}})
+        } else if (userToken.locale >= 40000){
+          updateMinus = { locale: userToken.locale - 40000 };
+          await User.update(updateMinus, {where:{id:userToken.id}})
+          updatePlus = { balance: user.balance + 40000 };
+          await User.update(updatePlus, {where:{id:user.id}})
         }
-        updateMinus = { balance: userToken.balance - 40000 };
-        await User.update(updateMinus, {where:{id:userToken.id}})
-        updatePlus = { balance: user.balance + 40000 };
-        await User.update(updatePlus, {where:{id:user.id}})
         break;
       case 4:
-        if(userToken.balance < 640000){
+        if((userToken.balance < 640000) && (userToken.locale < 640000)){
           return next(ApiError.badRequest("Для активации Лицензии пополните баланс"));
+        }else if (userToken.balance >= 640000){
+          updateMinus = { balance: userToken.balance - 640000 };
+          await User.update(updateMinus, {where:{id:userToken.id}})
+          updatePlus = { balance: user.balance + 640000 };
+          await User.update(updatePlus, {where:{id:user.id}})
+        } else if (userToken.locale >= 640000){
+          updateMinus = { locale: userToken.locale - 640000 };
+          await User.update(updateMinus, {where:{id:userToken.id}})
+          updatePlus = { balance: user.balance + 640000 };
+          await User.update(updatePlus, {where:{id:user.id}})
         }
-        updateMinus = { balance: userToken.balance - 640000 };
-        await User.update(updateMinus, {where:{id:userToken.id}})
-        updatePlus = { balance: user.balance + 345000 };
-        await User.update(updatePlus, {where:{id:user.id}})
         break;
     
       default:
