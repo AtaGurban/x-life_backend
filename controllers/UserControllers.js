@@ -6,7 +6,6 @@ const fs = require("fs");
 const { User, Key, Matrix_Table, Matrix } = require("../models/models");
 const jwt = require("jsonwebtoken");
 const jwt_decode = require("jwt-decode");
-const moment = require('moment')
 
 const generateJwt = (id, email, username, first_name, last_name, referral) => {
   return jwt.sign(
@@ -23,16 +22,20 @@ const generateJwt = (id, email, username, first_name, last_name, referral) => {
   );
 };
 
-const podpiskaCheck = async(user, level)=>{
-  if (user.balance < 1000){
-    return next(ApiError.badRequest("Для создания ключа недостаточно средств на балансе"));
-  } else {
+const podpiskaCheck = async(user, level, userId)=>{
+  if (user.balance < 1000 || user.locale < 1000){
+    return next(ApiError.badRequest("Для создания Лицензии недостаточно средств на балансе"));
+  } else if (user.balance >= 1000){
     let updatePodpiska = {balance: user.balance - 1000, podpiska: user.podpiska + 1000}
     await User.update(updatePodpiska, {where:{id:user.id}})
+  } else if (user.locale >= 1000){
+    let updatePodpiska = {locale: user.locale - 1000, podpiska: user.podpiska + 1000}
+    await User.update(updatePodpiska, {where:{id:user.id}})
   }
-  if (user.balance < 6000){
-    return next(ApiError.badRequest("Для создания ключа недостаточно средств на балансе"));
-  } else {
+  const updatedUser = await User.findOne({where:{id:userId}})
+  if ((updatedUser.balance < 5000) || (updatedUser.locale < 5000)){
+    return next(ApiError.badRequest("Для создания Лицензии недостаточно средств на балансе"));
+  } else if (updatedUser.balance >= 5000) {
     let updateKurs
     switch (level) {
       case 1:
@@ -49,6 +52,29 @@ const podpiskaCheck = async(user, level)=>{
         break;
       case 4:
         updateKurs = {balance: user.balance - 6000, kurs4: user.kurs4 + 5000}
+        await User.update(updateKurs, {where:{id:user.id}})
+        break;
+      default:
+        break;
+    }
+  }
+  else if (updatedUser.locale >= 5000) {
+    let updateKurs
+    switch (level) {
+      case 1:
+        updateKurs = {balance: user.locale - 6000, kurs1: user.kurs1 + 5000}
+        await User.update(updateKurs, {where:{id:user.id}})
+        break;
+      case 2:
+        updateKurs = {balance: user.locale - 6000, kurs2: user.kurs2 + 5000}
+        await User.update(updateKurs, {where:{id:user.id}})
+        break;
+      case 3:
+        updateKurs = {balance: user.locale - 6000, kurs3: user.kurs3 + 5000}
+        await User.update(updateKurs, {where:{id:user.id}})
+        break;
+      case 4:
+        updateKurs = {balance: user.locale - 6000, kurs4: user.kurs4 + 5000}
         await User.update(updateKurs, {where:{id:user.id}})
         break;
       default:
@@ -215,7 +241,7 @@ class UserController {
       await User.findOne({ where: { username: decodeToken.username } })
       )?.id;
     if(userToken.podpiska < 1000){
-      await podpiskaCheck(userToken, level)
+      await podpiskaCheck(userToken, level, userToken.id)
     }
     await kursCheck(userToken, level)
     
@@ -233,7 +259,7 @@ class UserController {
       if (!bool) {
         return next(
           ApiError.badRequest(
-            `Вы не можете создать ключь ${level} уровня для этого пользователя`
+            `Вы не можете создать Лицензию ${level} уровня для этого пользователя`
           )
         );
       }
@@ -243,15 +269,15 @@ class UserController {
       const countCandidate = candidate.length;
       if (countCandidate === 0) {
         return next(
-          ApiError.badRequest(`Вы не можете создать ключь ${level} уровня`)
+          ApiError.badRequest(`Вы не можете создать Лицензию ${level} уровня`)
         );
       }
 
-      const keyDublicate = await Key.findOne({ where: { userId, level } });
+      const keyDublicate = await Key.findOne({ where: { username, level } });
       if (keyDublicate) {
         return next(
           ApiError.badRequest(
-            `Вы уже создали ключь ${level} уровня для этого пользователя`
+            `Вы уже создали Лицензию ${level} уровня для этого пользователя`
           )
         );
       }
@@ -269,7 +295,7 @@ class UserController {
         });
         return res.json(key);
       } else {
-        return next(ApiError.badRequest("Вы не можете создать ключь"));
+        return next(ApiError.badRequest("Вы не можете создать Лицензию"));
       }
     } else {
       const hashPassword = await bcrypt.hash(password, 5);
@@ -308,7 +334,7 @@ class UserController {
       where: { username: userToken.username, userId: user.id, level },
     });
     if(userToken.podpiska < 1000){
-      await podpiskaCheck(userToken, level)
+      await podpiskaCheck(userToken, level, userToken.id)
     }
     await kursCheck(userToken, level)
     const parentLevel = await Matrix_Table.findAll({
@@ -316,16 +342,16 @@ class UserController {
     });
 
     if (!key) {
-      return next(ApiError.badRequest("Такой ключ не существует"));
+      return next(ApiError.badRequest("Такой Лицензии не существует"));
     }
     if (username !== decodeToken.username && key.phone !== userToken.phone) {
       return next(
-        ApiError.badRequest("Ключь пытается использовать другой пользователь")
+        ApiError.badRequest("Лицензию пытается использовать другой пользователь")
       );
     }
     let comparePassword = bcrypt.compareSync(password, key.password);
     if (!comparePassword) {
-      return next(ApiError.badRequest("Неправильный ключ"));
+      return next(ApiError.badRequest("Неправильная Лицензия"));
     }
 
     const matrix_parent_id = await Matrix.findAll({
@@ -346,14 +372,14 @@ class UserController {
     });
 
     if (keyDublicate) {
-      return next(ApiError.badRequest("Вы уже активировали этот ключ"));
+      return next(ApiError.badRequest("Вы уже активировали эту Лицензию"));
     }
     let updateMinus
     let updatePlus
     switch (level) {
       case 1:
         if(userToken.balance < 5000){
-          return next(ApiError.badRequest("Для активации ключа пополните баланс"));
+          return next(ApiError.badRequest("Для активации Лицензии пополните баланс"));
         }
         updateMinus = { balance: userToken.balance - 5000 };
         await User.update(updateMinus, {where:{id:userToken.id}})
@@ -362,7 +388,7 @@ class UserController {
         break;
       case 2:
         if(userToken.balance < 10000){
-          return next(ApiError.badRequest("Для активации ключа пополните баланс"));
+          return next(ApiError.badRequest("Для активации Лицензии пополните баланс"));
         }
         updateMinus = { balance: userToken.balance - 10000 };
         await User.update(updateMinus, {where:{id:userToken.id}})
@@ -371,7 +397,7 @@ class UserController {
         break;
       case 3:
         if(userToken.balance < 40000){
-          return next(ApiError.badRequest("Для активации ключа пополните баланс"));
+          return next(ApiError.badRequest("Для активации Лицензии пополните баланс"));
         }
         updateMinus = { balance: userToken.balance - 40000 };
         await User.update(updateMinus, {where:{id:userToken.id}})
@@ -380,7 +406,7 @@ class UserController {
         break;
       case 4:
         if(userToken.balance < 640000){
-          return next(ApiError.badRequest("Для активации ключа пополните баланс"));
+          return next(ApiError.badRequest("Для активации Лицензии пополните баланс"));
         }
         updateMinus = { balance: userToken.balance - 640000 };
         await User.update(updateMinus, {where:{id:userToken.id}})
@@ -537,11 +563,18 @@ class UserController {
         return next(ApiError.internal("Такой пользователь не найден"));
       }
       let now = new Date();
-      let {activation_date, podpiska} = user
+      let {activation_date, podpiska, locale, balance} = user
       let limit = new Date(activation_date.getFullYear(), (activation_date.getMonth() + 1), activation_date.getDate())
       if (now > limit){
-        let update = {podpiska: podpiska - 1000};
-        await User.update(update, { where: { id: user.id } });
+        if (balance >= 1000){
+          let updateBalance = {balance: balance - 1000, podpiska: podpiska + 1000}
+          await User.update(updateBalance, { where: { id: user.id } });
+        } else if (locale >= 1000){
+          let updateLocale = {locale: balance - 1000, podpiska: podpiska + 1000}
+          await User.update(updateLocale, { where: { id: user.id } });
+        }
+        let updatePodpiska = {podpiska: podpiska - 1000};
+        await User.update(updatePodpiska, { where: { id: user.id } });
 
       }
       user = await User.findOne({ where: { username } });
@@ -587,7 +620,6 @@ class UserController {
       }
 
       user.dataValues.referal = referal;
-      user.dataValues.activation_date = moment.utc(user.dataValues.activation_date).format('DD/MM/YYYY')
       return res.json(user);
     } catch (error) {
       console.log(error);

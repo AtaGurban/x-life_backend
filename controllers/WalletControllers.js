@@ -115,6 +115,9 @@ class WalletControllers {
     const user = await User.findOne({
       where: { username: decodeToken.username },
     });
+    if (!user.finance_password){
+      return next(ApiError.internal("Создайте пароль"));
+    }
      let updateMinus
     let comparePassword = bcrypt.compareSync(password, user.finance_password);
     if (!comparePassword) {
@@ -138,6 +141,9 @@ class WalletControllers {
     const user = await User.findOne({
       where: { username: decodeToken.username },
     });
+    if (!user.finance_password){
+      return next(ApiError.internal("Создайте пароль"));
+    }
     let updateMinus
     let comparePassword = bcrypt.compareSync(password, user.finance_password);
     if (!comparePassword) {
