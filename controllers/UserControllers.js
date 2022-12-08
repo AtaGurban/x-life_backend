@@ -39,20 +39,20 @@ const podpiskaCheck = async(user, level, userId)=>{
     let updateKurs
     switch (level) {
       case 1:
-        updateKurs = {balance: user.balance - 6000, kurs1: user.kurs1 + 5000}
-        await User.update(updateKurs, {where:{id:user.id}})
+        updateKurs = {balance: updatedUser.balance - 5000, kurs1: updatedUser.kurs1 + 5000}
+        await User.update(updateKurs, {where:{id:updatedUser.id}})
         break;
       case 2:
-        updateKurs = {balance: user.balance - 6000, kurs2: user.kurs2 + 5000}
-        await User.update(updateKurs, {where:{id:user.id}})
+        updateKurs = {balance: updatedUser.balance - 5000, kurs2: updatedUser.kurs2 + 5000}
+        await User.update(updateKurs, {where:{id:updatedUser.id}})
         break;
       case 3:
-        updateKurs = {balance: user.balance - 6000, kurs3: user.kurs3 + 5000}
-        await User.update(updateKurs, {where:{id:user.id}})
+        updateKurs = {balance: updatedUser.balance - 5000, kurs3: updatedUser.kurs3 + 5000}
+        await User.update(updateKurs, {where:{id:updatedUser.id}})
         break;
       case 4:
-        updateKurs = {balance: user.balance - 6000, kurs4: user.kurs4 + 5000}
-        await User.update(updateKurs, {where:{id:user.id}})
+        updateKurs = {balance: updatedUser.balance - 5000, kurs4: updatedUser.kurs4 + 5000}
+        await User.update(updateKurs, {where:{id:updatedUser.id}})
         break;
       default:
         break;
@@ -62,20 +62,20 @@ const podpiskaCheck = async(user, level, userId)=>{
     let updateKurs
     switch (level) {
       case 1:
-        updateKurs = {balance: user.locale - 6000, kurs1: user.kurs1 + 5000}
-        await User.update(updateKurs, {where:{id:user.id}})
+        updateKurs = {balance: updatedUser.locale - 5000, kurs1: updatedUser.kurs1 + 5000}
+        await User.update(updateKurs, {where:{id:updatedUser.id}})
         break;
       case 2:
-        updateKurs = {balance: user.locale - 6000, kurs2: user.kurs2 + 5000}
-        await User.update(updateKurs, {where:{id:user.id}})
+        updateKurs = {balance: updatedUser.locale - 5000, kurs2: updatedUser.kurs2 + 5000}
+        await User.update(updateKurs, {where:{id:updatedUser.id}})
         break;
       case 3:
-        updateKurs = {balance: user.locale - 6000, kurs3: user.kurs3 + 5000}
-        await User.update(updateKurs, {where:{id:user.id}})
+        updateKurs = {balance: updatedUser.locale - 5000, kurs3: updatedUser.kurs3 + 5000}
+        await User.update(updateKurs, {where:{id:updatedUser.id}})
         break;
       case 4:
-        updateKurs = {balance: user.locale - 6000, kurs4: user.kurs4 + 5000}
-        await User.update(updateKurs, {where:{id:user.id}})
+        updateKurs = {balance: updatedUser.locale - 5000, kurs4: updatedUser.kurs4 + 5000}
+        await User.update(updateKurs, {where:{id:updatedUser.id}})
         break;
       default:
         break;
