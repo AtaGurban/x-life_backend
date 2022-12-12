@@ -617,7 +617,7 @@ class UserController {
           user = await User.update(updateLocale, { where: { id: user.id } });
         } else {
           if (podpiska < 1000){
-            let updatePodpiska = { podpiska: 0};
+            let updatePodpiska = { podpiska: 0, activation_date: now};
             user = await User.update(updatePodpiska, { where: { id: user.id } });
           } else {
             let updatePodpiska = { podpiska: podpiska - 1000, activation_date: now};
