@@ -22,37 +22,37 @@ const generateJwt = (id, email, username, first_name, last_name, referral) => {
   );
 };
 
-const podpiskaCheck = async(user, level, userId)=>{
-  if ((user.balance < 1000) && (user.locale < 1000)){
+const podpiskaCheck = async (user, level, userId) => {
+  if ((user.balance < 1000) && (user.locale < 1000)) {
     return next(ApiError.badRequest("Для создания Лицензии недостаточно средств на балансе"));
-  } else if (user.balance >= 1000){
-    let updatePodpiska = {balance: user.balance - 1000, podpiska: user.podpiska + 1000}
-    await User.update(updatePodpiska, {where:{id:user.id}})
-  } else if (user.locale >= 1000){
-    let updatePodpiska = {locale: user.locale - 1000, podpiska: user.podpiska + 1000}
-    await User.update(updatePodpiska, {where:{id:user.id}})
+  } else if (user.balance >= 1000) {
+    let updatePodpiska = { balance: user.balance - 1000, podpiska: user.podpiska + 1000 }
+    await User.update(updatePodpiska, { where: { id: user.id } })
+  } else if (user.locale >= 1000) {
+    let updatePodpiska = { locale: user.locale - 1000, podpiska: user.podpiska + 1000 }
+    await User.update(updatePodpiska, { where: { id: user.id } })
   }
-  const updatedUser = await User.findOne({where:{id:userId}})
-  if ((updatedUser.balance < 5000) && (updatedUser.locale < 5000)){
+  const updatedUser = await User.findOne({ where: { id: userId } })
+  if ((updatedUser.balance < 5000) && (updatedUser.locale < 5000)) {
     return next(ApiError.badRequest("Для создания Лицензии недостаточно средств на балансе"));
   } else if (updatedUser.balance >= 5000) {
     let updateKurs
     switch (level) {
       case 1:
-        updateKurs = {balance: updatedUser.balance - 5000, kurs1: updatedUser.kurs1 + 5000}
-        await User.update(updateKurs, {where:{id:updatedUser.id}})
+        updateKurs = { balance: updatedUser.balance - 5000, kurs1: updatedUser.kurs1 + 5000 }
+        await User.update(updateKurs, { where: { id: updatedUser.id } })
         break;
       case 2:
-        updateKurs = {balance: updatedUser.balance - 5000, kurs2: updatedUser.kurs2 + 5000}
-        await User.update(updateKurs, {where:{id:updatedUser.id}})
+        updateKurs = { balance: updatedUser.balance - 5000, kurs2: updatedUser.kurs2 + 5000 }
+        await User.update(updateKurs, { where: { id: updatedUser.id } })
         break;
       case 3:
-        updateKurs = {balance: updatedUser.balance - 5000, kurs3: updatedUser.kurs3 + 5000}
-        await User.update(updateKurs, {where:{id:updatedUser.id}})
+        updateKurs = { balance: updatedUser.balance - 5000, kurs3: updatedUser.kurs3 + 5000 }
+        await User.update(updateKurs, { where: { id: updatedUser.id } })
         break;
       case 4:
-        updateKurs = {balance: updatedUser.balance - 5000, kurs4: updatedUser.kurs4 + 5000}
-        await User.update(updateKurs, {where:{id:updatedUser.id}})
+        updateKurs = { balance: updatedUser.balance - 5000, kurs4: updatedUser.kurs4 + 5000 }
+        await User.update(updateKurs, { where: { id: updatedUser.id } })
         break;
       default:
         break;
@@ -62,20 +62,20 @@ const podpiskaCheck = async(user, level, userId)=>{
     let updateKurs
     switch (level) {
       case 1:
-        updateKurs = {balance: updatedUser.locale - 5000, kurs1: updatedUser.kurs1 + 5000}
-        await User.update(updateKurs, {where:{id:updatedUser.id}})
+        updateKurs = { locale: updatedUser.locale - 5000, kurs1: updatedUser.kurs1 + 5000 }
+        await User.update(updateKurs, { where: { id: updatedUser.id } })
         break;
       case 2:
-        updateKurs = {balance: updatedUser.locale - 5000, kurs2: updatedUser.kurs2 + 5000}
-        await User.update(updateKurs, {where:{id:updatedUser.id}})
+        updateKurs = { locale: updatedUser.locale - 5000, kurs2: updatedUser.kurs2 + 5000 }
+        await User.update(updateKurs, { where: { id: updatedUser.id } })
         break;
       case 3:
-        updateKurs = {balance: updatedUser.locale - 5000, kurs3: updatedUser.kurs3 + 5000}
-        await User.update(updateKurs, {where:{id:updatedUser.id}})
+        updateKurs = { locale: updatedUser.locale - 5000, kurs3: updatedUser.kurs3 + 5000 }
+        await User.update(updateKurs, { where: { id: updatedUser.id } })
         break;
       case 4:
-        updateKurs = {balance: updatedUser.locale - 5000, kurs4: updatedUser.kurs4 + 5000}
-        await User.update(updateKurs, {where:{id:updatedUser.id}})
+        updateKurs = { locale: updatedUser.locale - 5000, kurs4: updatedUser.kurs4 + 5000 }
+        await User.update(updateKurs, { where: { id: updatedUser.id } })
         break;
       default:
         break;
@@ -83,51 +83,70 @@ const podpiskaCheck = async(user, level, userId)=>{
   }
 }
 
-const kursCheck = async(user, level)=>{
+const kursCheck = async (user, level) => {
   let updateKurs
-  switch (level) {
-    case 1:
-      if (user.kurs1 < 5000){
-        if (user.balance < 5000){
-          return next(ApiError.badRequest("Hедостаточно средств"));
-        } else {
-          updateKurs = {balance: user.balance - 5000, kurs1: user.kurs1 + 5000}
-          await User.update(updateKurs, {where:{id:user.id}})
+  if ((user.balance < 5000) && (user.locale < 5000)) {
+    return next(ApiError.badRequest("Для создания Лицензии недостаточно средств на балансе"));
+  } else if (user.balance >= 5000) {
+    switch (level) {
+      case 1:
+        if (user.kurs1 < 5000) {
+          updateKurs = { balance: user.balance - 5000, kurs1: user.kurs1 + 5000 }
+          await User.update(updateKurs, { where: { id: user.id } })
         }
-      }
-      break;
-    case 2:
-      if (user.kurs2 < 5000){
-        if (user.balance < 5000){
-          return next(ApiError.badRequest("Hедостаточно средств"));
-        } else {
-          updateKurs = {balance: user.balance - 5000, kurs2: user.kurs2 + 5000}
-          await User.update(updateKurs, {where:{id:user.id}})
+        break;
+      case 2:
+        if (user.kurs2 < 5000) {
+          updateKurs = { balance: user.balance - 5000, kurs2: user.kurs2 + 5000 }
+          await User.update(updateKurs, { where: { id: user.id } })
         }
-      }
-      break;
-    case 3:
-      if (user.kurs3 < 5000){
-        if (user.balance < 5000){
-          return next(ApiError.badRequest("Hедостаточно средств"));
-        } else {
-          updateKurs = {balance: user.balance - 5000, kurs3: user.kurs3 + 5000}
-          await User.update(updateKurs, {where:{id:user.id}})
+        break;
+      case 3:
+        if (user.kurs3 < 5000) {
+          updateKurs = { balance: user.balance - 5000, kurs3: user.kurs3 + 5000 }
+          await User.update(updateKurs, { where: { id: user.id } })
         }
-      }
-      break;
-    case 4:
-      if (user.kurs4 < 5000){
-        if (user.balance < 5000){
-          return next(ApiError.badRequest("Hедостаточно средств"));
-        } else {
-          updateKurs = {balance: user.balance - 5000, kurs1: user.kurs4 + 5000}
-          await User.update(updateKurs, {where:{id:user.id}})
+        break;
+      case 4:
+        if (user.kurs4 < 5000) {
+          updateKurs = { balance: user.balance - 5000, kurs4: user.kurs4 + 5000 }
+          await User.update(updateKurs, { where: { id: user.id } })
         }
-      }
-      break;
-    default:
-      break;
+        break;
+      default:
+        break;
+    }
+  }
+  else if (updatedUser.locale >= 5000) {
+    let updateKurs
+    switch (level) {
+      case 1:
+        if (user.kurs1 < 5000) {
+          updateKurs = { locale: user.locale - 5000, kurs1: user.kurs1 + 5000 }
+          await User.update(updateKurs, { where: { id: user.id } })
+        }
+        break;
+      case 2:
+        if (user.kurs2 < 5000) {
+          updateKurs = { locale: user.locale - 5000, kurs2: user.kurs2 + 5000 }
+          await User.update(updateKurs, { where: { id: user.id } })
+        }
+        break;
+      case 3:
+        if (user.kurs3 < 5000) {
+          updateKurs = { locale: user.locale - 5000, kurs3: user.kurs3 + 5000 }
+          await User.update(updateKurs, { where: { id: user.id } })
+        }
+        break;
+      case 4:
+        if (user.kurs4 < 5000) {
+          updateKurs = { locale: user.locale - 5000, kurs4: user.kurs4 + 5000 }
+          await User.update(updateKurs, { where: { id: user.id } })
+        }
+        break;
+      default:
+        break;
+    }
   }
 }
 
@@ -141,8 +160,8 @@ async function highCheck(level, user, idCreateUser) {
     parentSecond.id === parentSecond.referal_id
       ? parentSecond
       : await User.findOne({
-          where: { id: parentSecond.referal_id },
-        });
+        where: { id: parentSecond.referal_id },
+      });
   let bool = false;
 
   switch (level) {
@@ -233,18 +252,18 @@ class UserController {
       where: { username: decodeToken.username },
     });
     let bool;
-    
+
     if (!level || !password || !phone || !username) {
       return next(ApiError.badRequest("Не все поля заполнены"));
     }
     const userId = (
       await User.findOne({ where: { username: decodeToken.username } })
-      )?.id;
-    if(userToken.podpiska < 1000){
+    )?.id;
+    if (userToken.podpiska < 1000) {
       await podpiskaCheck(userToken, level, userToken.id)
     }
     await kursCheck(userToken, level)
-    
+
     const userKey = await User.findOne({ where: { username } });
     if (!userKey) {
       return next(ApiError.badRequest("Такой пользователь не существует"));
@@ -333,7 +352,7 @@ class UserController {
     const key = await Key.findOne({
       where: { username: userToken.username, userId: user.id, level },
     });
-    if(userToken.podpiska < 1000){
+    if (userToken.podpiska < 1000) {
       await podpiskaCheck(userToken, level, userToken.id)
     }
     await kursCheck(userToken, level)
@@ -378,66 +397,66 @@ class UserController {
     let updatePlus
     switch (level) {
       case 1:
-        if((userToken.balance < 5000) && (userToken.locale < 5000)){
+        if ((userToken.balance < 5000) && (userToken.locale < 5000)) {
           return next(ApiError.badRequest("Для активации Лицензии пополните баланс"));
-        } else if (userToken.balance >= 5000){
+        } else if (userToken.balance >= 5000) {
           updateMinus = { balance: userToken.balance - 5000 };
-          await User.update(updateMinus, {where:{id:userToken.id}})
+          await User.update(updateMinus, { where: { id: userToken.id } })
           updatePlus = { balance: user.balance + 5000 };
-          await User.update(updatePlus, {where:{id:user.id}})
-        } else if (userToken.locale >= 5000){
+          await User.update(updatePlus, { where: { id: user.id } })
+        } else if (userToken.locale >= 5000) {
           updateMinus = { locale: userToken.locale - 5000 };
-          await User.update(updateMinus, {where:{id:userToken.id}})
+          await User.update(updateMinus, { where: { id: userToken.id } })
           updatePlus = { balance: user.balance + 5000 };
-          await User.update(updatePlus, {where:{id:user.id}})
+          await User.update(updatePlus, { where: { id: user.id } })
         }
         break;
       case 2:
-        if((userToken.balance < 10000) && (userToken.locale < 10000)){
+        if ((userToken.balance < 10000) && (userToken.locale < 10000)) {
           return next(ApiError.badRequest("Для активации Лицензии пополните баланс"));
-        }else if (userToken.balance >= 10000){
+        } else if (userToken.balance >= 10000) {
           updateMinus = { balance: userToken.balance - 10000 };
-          await User.update(updateMinus, {where:{id:userToken.id}})
+          await User.update(updateMinus, { where: { id: userToken.id } })
           updatePlus = { balance: user.balance + 10000 };
-          await User.update(updatePlus, {where:{id:user.id}})
-        } else if (userToken.locale >= 10000){
+          await User.update(updatePlus, { where: { id: user.id } })
+        } else if (userToken.locale >= 10000) {
           updateMinus = { locale: userToken.locale - 10000 };
-          await User.update(updateMinus, {where:{id:userToken.id}})
+          await User.update(updateMinus, { where: { id: userToken.id } })
           updatePlus = { balance: user.balance + 10000 };
-          await User.update(updatePlus, {where:{id:user.id}})
+          await User.update(updatePlus, { where: { id: user.id } })
         }
         break;
       case 3:
-        if((userToken.balance < 40000) && (userToken.locale < 40000)){
+        if ((userToken.balance < 40000) && (userToken.locale < 40000)) {
           return next(ApiError.badRequest("Для активации Лицензии пополните баланс"));
-        }else if (userToken.balance >= 40000){
+        } else if (userToken.balance >= 40000) {
           updateMinus = { balance: userToken.balance - 40000 };
-          await User.update(updateMinus, {where:{id:userToken.id}})
+          await User.update(updateMinus, { where: { id: userToken.id } })
           updatePlus = { balance: user.balance + 40000 };
-          await User.update(updatePlus, {where:{id:user.id}})
-        } else if (userToken.locale >= 40000){
+          await User.update(updatePlus, { where: { id: user.id } })
+        } else if (userToken.locale >= 40000) {
           updateMinus = { locale: userToken.locale - 40000 };
-          await User.update(updateMinus, {where:{id:userToken.id}})
+          await User.update(updateMinus, { where: { id: userToken.id } })
           updatePlus = { balance: user.balance + 40000 };
-          await User.update(updatePlus, {where:{id:user.id}})
+          await User.update(updatePlus, { where: { id: user.id } })
         }
         break;
       case 4:
-        if((userToken.balance < 640000) && (userToken.locale < 640000)){
+        if ((userToken.balance < 640000) && (userToken.locale < 640000)) {
           return next(ApiError.badRequest("Для активации Лицензии пополните баланс"));
-        }else if (userToken.balance >= 640000){
+        } else if (userToken.balance >= 640000) {
           updateMinus = { balance: userToken.balance - 640000 };
-          await User.update(updateMinus, {where:{id:userToken.id}})
+          await User.update(updateMinus, { where: { id: userToken.id } })
           updatePlus = { balance: user.balance + 640000 };
-          await User.update(updatePlus, {where:{id:user.id}})
-        } else if (userToken.locale >= 640000){
+          await User.update(updatePlus, { where: { id: user.id } })
+        } else if (userToken.locale >= 640000) {
           updateMinus = { locale: userToken.locale - 640000 };
-          await User.update(updateMinus, {where:{id:userToken.id}})
+          await User.update(updateMinus, { where: { id: userToken.id } })
           updatePlus = { balance: user.balance + 640000 };
-          await User.update(updatePlus, {where:{id:user.id}})
+          await User.update(updatePlus, { where: { id: user.id } })
         }
         break;
-    
+
       default:
         break;
     }
@@ -570,12 +589,12 @@ class UserController {
         return next(ApiError.internal("Неверный пароль"));
       }
       const hashPassword = await bcrypt.hash(new_password, 5);
-      let updateFinPassword = {password: hashPassword}
-      await User.update(updateFinPassword, {where:{id:user.id}})
+      let updateFinPassword = { password: hashPassword }
+      await User.update(updateFinPassword, { where: { id: user.id } })
       return res.json(true)
-  } catch (error) {
+    } catch (error) {
       return res.json(error)
-  }
+    }
   }
   async user(req, res, next) {
     const { authorization } = req.headers;
@@ -587,18 +606,25 @@ class UserController {
         return next(ApiError.internal("Такой пользователь не найден"));
       }
       let now = new Date();
-      let {activation_date, podpiska, locale, balance} = user
+      let { activation_date, podpiska, locale, balance } = user
       let limit = new Date(activation_date.getFullYear(), (activation_date.getMonth() + 1), activation_date.getDate())
-      if (now > limit){
-        if (balance >= 1000){
-          let updateBalance = {balance: balance - 1000, podpiska: podpiska + 1000}
-          await User.update(updateBalance, { where: { id: user.id } });
-        } else if (locale >= 1000){
-          let updateLocale = {locale: balance - 1000, podpiska: podpiska + 1000}
-          await User.update(updateLocale, { where: { id: user.id } });
+      if (now > limit) {
+        if (balance >= 1000) {
+          let updateBalance = { balance: balance - 1000, activation_date: now}
+          user = await User.update(updateBalance, { where: { id: user.id } });
+        } else if (locale >= 1000) {
+          let updateLocale = { locale: locale - 1000, activation_date: now }
+          user = await User.update(updateLocale, { where: { id: user.id } });
+        } else {
+          if (podpiska < 1000){
+            let updatePodpiska = { podpiska: 0};
+            user = await User.update(updatePodpiska, { where: { id: user.id } });
+          } else {
+            let updatePodpiska = { podpiska: podpiska - 1000, activation_date: now};
+            user = await User.update(updatePodpiska, { where: { id: user.id } });
+          }
         }
-        let updatePodpiska = {podpiska: podpiska - 1000};
-        await User.update(updatePodpiska, { where: { id: user.id } });
+
 
       }
       user = await User.findOne({ where: { username } });
@@ -615,14 +641,14 @@ class UserController {
         parentSecond.id === parentSecond.referal_id
           ? parentSecond
           : await User.findOne({
-              where: { id: parentSecond.referal_id },
-            });
+            where: { id: parentSecond.referal_id },
+          });
       const parentFour =
         parentThird.id === parentThird.referal_id
           ? parentSecond
           : await User.findOne({
-              where: { id: parentThird.referal_id },
-            });
+            where: { id: parentThird.referal_id },
+          });
       switch (matrixUser.length) {
         case 0:
           referal = parent;
@@ -678,10 +704,10 @@ class UserController {
       where: { username: decodeToken.username },
     });
     let update = {}
-    if (!firstName && lastName){
+    if (!firstName && lastName) {
       update = { last_name: lastName };
-    } else if (firstName && !lastName){
-      update = {first_name: firstName };
+    } else if (firstName && !lastName) {
+      update = { first_name: firstName };
     } else {
       update = { last_name: lastName, first_name: firstName };
     }
@@ -697,20 +723,20 @@ class UserController {
     const token = authorization.slice(7);
     const decodeToken = jwt_decode(token);
     let update = {}
-    if (!instagram && !telegram && vk){
-      update = {vkontakte:vk}
-    } else if(!instagram && telegram && !vk){
-      update = {telegram}
-    } else if(instagram && !telegram && !vk){
-      update = {instagram}
-    } else if (instagram && telegram && !vk){
-      update = {instagram, telegram}
-    } else if (instagram && !telegram && vk){
-      update = {instagram, vkontakte:vk}
-    } else if (!instagram && telegram && vk){
-      update = {telegram, vkontakte:vk}
+    if (!instagram && !telegram && vk) {
+      update = { vkontakte: vk }
+    } else if (!instagram && telegram && !vk) {
+      update = { telegram }
+    } else if (instagram && !telegram && !vk) {
+      update = { instagram }
+    } else if (instagram && telegram && !vk) {
+      update = { instagram, telegram }
+    } else if (instagram && !telegram && vk) {
+      update = { instagram, vkontakte: vk }
+    } else if (!instagram && telegram && vk) {
+      update = { telegram, vkontakte: vk }
     } else {
-      update = {telegram, instagram, vkontakte:vk}
+      update = { telegram, instagram, vkontakte: vk }
     }
     const user = await User.findOne({
       where: { username: decodeToken.username },
@@ -719,7 +745,7 @@ class UserController {
     return res.json(updatedUser)
   }
 
-  async description (req, res, next){
+  async description(req, res, next) {
     const { description } = req.body;
     if (!description) {
       return next(ApiError.internal("Поля не заполнены"));
@@ -730,7 +756,7 @@ class UserController {
     const user = await User.findOne({
       where: { username: decodeToken.username },
     });
-    let update = {description}
+    let update = { description }
     const updatedUser = await User.update(update, { where: { id: user.id } });
     return res.json(updatedUser)
   }
